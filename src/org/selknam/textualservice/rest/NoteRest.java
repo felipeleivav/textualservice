@@ -18,6 +18,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.selknam.textualservice.arq.exception.ConnectionException;
 import org.selknam.textualservice.dao.NoteDAO;
+import org.selknam.textualservice.dao.ShareDAO;
 import org.selknam.textualservice.dbo.NoteDBO;
 
 @Path("/note")
@@ -45,6 +46,13 @@ public class NoteRest {
     	int userId = Integer.parseInt(request.getAttribute("userid").toString());
     	NoteDAO noteDao = new NoteDAO();
     	NoteDBO note = noteDao.getNote(userId, noteId);
+    	if (null==note) {
+    		ShareDAO shareDao = new ShareDAO();
+    		if (shareDao.userHasInvitation(userId, noteId)) {
+    			note = noteDao.getNoteWithoutUserValidation(noteId);
+    		}
+    		shareDao.close();
+    	}
     	noteDao.close();
     	return note;
     }
@@ -69,6 +77,13 @@ public class NoteRest {
     	NoteDAO noteDao = new NoteDAO();
 		note.setUserId(userId);
 		NoteDBO updatedNote = noteDao.updateNote(note);
+    	if (null==updatedNote.getId()) {
+    		ShareDAO shareDao = new ShareDAO();
+    		if (shareDao.userHasInvitation(userId, note.getId())) {
+    			updatedNote = noteDao.updateNoteWithoutUserValidation(note);
+    		}
+    		shareDao.close();
+    	}
     	noteDao.close();
     	return updatedNote;
     }

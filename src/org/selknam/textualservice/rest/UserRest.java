@@ -1,8 +1,11 @@
 package org.selknam.textualservice.rest;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import org.selknam.textualservice.arq.exception.ConnectionException;
@@ -29,6 +32,12 @@ public class UserRest {
 			}
 		}
 		return created;
+	}
+	
+	@GET
+	public int getUserId(@Context HttpServletRequest request) {
+		int userId = Integer.parseInt(request.getAttribute("userid").toString());
+		return userId;
 	}
 	
 }

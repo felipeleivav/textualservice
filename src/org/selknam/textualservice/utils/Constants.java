@@ -12,5 +12,11 @@ public class Constants {
 	public static String SERVER_KEYSTORE_PASS = "server.keystore.pass";
 	public static String SERVER_PORT_HTTP = "server.port.http";
 	public static String SERVER_PORT_HTTPS = "server.port.https";
+	
+	// Share request statuses
+	public static int PENDING = 0;
+	public static int ACCEPTED = 1;
+	public static int DECLINED = 2;
+	public static int CANCELLED = 3;
 		
 }

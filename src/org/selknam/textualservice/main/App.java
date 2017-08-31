@@ -61,8 +61,10 @@ public class App {
 			sslConnector.setPort(httpsPort);
 			// If no error setting https up, then disable plain http
 			jettyServer.setConnectors(new Connector[]{sslConnector});
+			logger.warn("Running on: "+httpsPort);
         } catch (Exception e) {
         	logger.warn("Can't enable SSL ", e);
+        	logger.warn("Running on: "+httpPort);
         }
 		
         ServletHolder jerseyServlet = context.addServlet(org.glassfish.jersey.servlet.ServletContainer.class, "/*");

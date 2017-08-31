@@ -21,7 +21,7 @@ public class Authenticator implements ContainerRequestFilter {
 	
 	public void filter(ContainerRequestContext containerRequest) throws WebApplicationException {
 		if (containerRequest.getMethod().equals("OPTIONS") ||
-			containerRequest.getUriInfo().getPath().equalsIgnoreCase("user") ||
+			(containerRequest.getUriInfo().getPath().equalsIgnoreCase("user") && containerRequest.getMethod().equals("PUT")) ||
 			containerRequest.getUriInfo().getPath().equalsIgnoreCase("meta")) {
 			return;
 		}

@@ -90,6 +90,29 @@ public class NoteDAO extends BaseDAO {
 		return note;
 	}
 	
+	public NoteDBO getNoteWithoutUserValidation(int noteId) throws ConnectionException {
+		NoteDBO note = null;
+		try {
+			PreparedStatement stmt = createQuery("SELECT id,user_id,title,content,last_update FROM note WHERE id=?");
+			stmt.setInt(1, noteId);
+			ResultSet rs = stmt.executeQuery();
+			while (rs.next()) {
+				note = new NoteDBO();
+				note.setId(rs.getInt(1));
+				note.setUserId(rs.getInt(2));
+				note.setTitle(rs.getString(3));
+				note.setContent(rs.getString(4));
+				note.setLastUpdate(rs.getTimestamp(5));
+			}
+			rs.close();
+			stmt.close();
+		} catch (SQLException e) {
+			logger.error("Database error ", e);
+			throw new ConnectionException(e.getMessage());
+		}
+		return note;
+	}
+	
 	public NoteDBO createNote(NoteDBO note) throws ConnectionException {
 		NoteDBO createdNote = new NoteDBO();
 		Date actualDate = new Date();
@@ -139,6 +162,27 @@ public class NoteDAO extends BaseDAO {
 		return updatedNote;
 	}
 	
+	public NoteDBO updateNoteWithoutUserValidation(NoteDBO note) throws ConnectionException {
+		NoteDBO updatedNote = new NoteDBO();
+		Date actualDate = new Date();
+		try {
+			PreparedStatement stmt = createQuery("UPDATE note SET title=?,content=?,last_update=? WHERE id=?");
+			stmt.setString(1, note.getTitle());
+			stmt.setString(2, note.getContent());
+			stmt.setTimestamp(3, new Timestamp(actualDate.getTime()));
+			stmt.setInt(4, note.getId());
+			if (stmt.executeUpdate()>0) {
+				updatedNote.setId(note.getId());
+				updatedNote.setLastUpdate(actualDate);
+			}
+			stmt.close();
+		} catch (SQLException e) {
+			logger.error("Database error ", e);
+			throw new ConnectionException(e.getMessage());
+		}
+		return updatedNote;
+	}
+	
 	public boolean deleteNote(int userId, int noteId) throws ConnectionException {
 		boolean res = false;
 		try {
@@ -160,6 +204,26 @@ public class NoteDAO extends BaseDAO {
 			PreparedStatement stmt = createQuery("DELETE FROM note WHERE user_id=?");
 			stmt.setInt(1, userId);
 			res = stmt.executeUpdate()>0;
+			stmt.close();
+		} catch (SQLException e) {
+			logger.error("Database error ", e);
+			throw new ConnectionException(e.getMessage());
+		}
+		return res;
+	}
+	
+	public boolean userOwnsNote(int userId, int noteId) throws ConnectionException {
+		boolean res = false;
+		try {
+			PreparedStatement stmt = createQuery("SELECT id FROM note WHERE user_id=? AND id=?");
+			stmt.setInt(1, userId);
+			stmt.setInt(2, noteId);
+			ResultSet rs = stmt.executeQuery();
+			while (rs.next()) {
+				res = true;
+				break;
+			}
+			rs.close();
 			stmt.close();
 		} catch (SQLException e) {
 			logger.error("Database error ", e);

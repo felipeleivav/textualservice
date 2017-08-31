@@ -53,6 +53,42 @@ public class UserDAO extends BaseDAO {
 		return userId;
 	}
 	
+	public String getUsername(int userId) throws ConnectionException {
+		String username = null;
+		try {
+			PreparedStatement stmt = createQuery("SELECT username FROM user WHERE id=?");
+			stmt.setInt(1, userId);
+			ResultSet rs = stmt.executeQuery();
+			while (rs.next()) {
+				username = rs.getString(1);
+			}
+			rs.close();
+			stmt.close();
+		} catch (SQLException e) {
+			logger.error("Database error ", e);
+			throw new ConnectionException(e.getMessage());
+		}
+		return username;
+	}
+	
+	public int userExists(String username) throws ConnectionException {
+		int returnedUserId = 0;
+		try {
+			PreparedStatement stmt = createQuery("SELECT id FROM user WHERE username=?");
+			stmt.setString(1, username);
+			ResultSet rs = stmt.executeQuery();
+			while (rs.next()) {
+				returnedUserId = rs.getInt(1);
+			}
+			rs.close();
+			stmt.close();
+		} catch (SQLException e) {
+			logger.error("Database error ", e);
+			throw new ConnectionException(e.getMessage());
+		}
+		return returnedUserId;
+	}
+	
 	public boolean createUser(UserDBO user) throws ConnectionException {
 		boolean res = false;
 		try {
